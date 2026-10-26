@@ -1,4 +1,4 @@
-import { reactive, Plugin, computed, ComputedRef, watchEffect, ref } from 'vue'
+import { reactive, Plugin, computed, ComputedRef, ref } from 'vue'
 import { OptionsInterface } from './interfaces/options'
 import { PluginOptionsInterface } from './interfaces/plugin-options'
 import { LanguageInterface } from './interfaces/language'
@@ -430,26 +430,23 @@ export class I18n {
    * Get the translation for the given key and watch for any changes.
    */
   wTrans(key: string, replacements: ReplacementsInterface = {}): ComputedRef<string> {
-    const syncMessage = () => {
-      let value = this.findTranslation(key)
+    // Resolved inside the computed, which tracks activeMessages by itself (a language loaded later still updates
+    // the text). This used to start a watchEffect per call that wrote the result back into activeMessages[key]:
+    // trans() and $t() run during a render, outside any effect scope, so that watcher was never stopped and stayed
+    // subscribed to the long-lived activeMessages for good, in the browser on every visit and on the server on every
+    // request. A computed nothing reads holds no subscription.
+    //
+    // The leak was reported, and this fix proposed, by @marcanthonysurmont in
+    // https://github.com/xiCO2k/laravel-vue-i18n/issues/222
+    return computed(() => {
+      let message = this.findTranslation(key)
 
-      if (!this.isValid(value)) {
-        value = this.findTranslation(key.replace(/\//g, '.'))
+      if (!this.isValid(message)) {
+        message = this.findTranslation(key.replace(/\//g, '.'))
       }
 
-      this.activeMessages[key] = this.isValid(value) ? value : key
-    }
-
-    // Nothing can change the language while a page is rendered on the server, so there is nothing to watch. An
-    // effect created during a render is also never stopped there (components are never unmounted), which left every
-    // call subscribed to the process-wide activeMessages for good: one leaked effect per translation per request.
-    if (isServer) {
-      syncMessage()
-    } else {
-      watchEffect(syncMessage)
-    }
-
-    return computed(() => this.makeReplacements(this.activeMessages[key], replacements))
+      return this.makeReplacements(this.isValid(message) ? message : key, replacements)
+    })
   }
 
   /**

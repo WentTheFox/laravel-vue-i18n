@@ -14,6 +14,27 @@
     files with <b>Vue</b>. It uses the same logic used on <a href="https://laravel.com/docs/8.x/localization">Laravel Localization</a>.
 </p>
 
+> [!NOTE]
+> This is a fork of [xiCO2k/laravel-vue-i18n](https://github.com/xiCO2k/laravel-vue-i18n), published as
+> `@wentthefox-forks/laravel-vue-i18n` only to carry one fix until it is available upstream. Everything else is upstream's
+> work and unchanged.
+>
+> **The fix:** `wTrans()` (and so `trans()`, `transChoice()`, `$t()` and `$tChoice()`) started a `watchEffect` on every call.
+> Those run during a render, outside any effect scope, so the watcher was never stopped and stayed subscribed to the
+> long-lived translation state: a leak per translated string, on every request of a server-side rendered app and on every
+> client-side navigation in the browser. Translations are now resolved inside the `computed`, which keeps them reactive
+> without a long-lived subscription.
+>
+> **Credit:** the leak was reported, with a reproduction and this fix, by [@marcanthonysurmont](https://github.com/marcanthonysurmont) in
+> [xiCO2k/laravel-vue-i18n#222](https://github.com/xiCO2k/laravel-vue-i18n/issues/222). It was also found independently,
+> while debugging a production Inertia SSR server, before that issue was spotted; heap snapshots there showed the same
+> ~99 retained effects per rendered page.
+>
+> To use it under the original name, so no imports change:
+> ```sh
+> npm i laravel-vue-i18n@npm:@wentthefox-forks/laravel-vue-i18n
+> ```
+
 ## Installation
 
 With [npm](https://www.npmjs.com):
