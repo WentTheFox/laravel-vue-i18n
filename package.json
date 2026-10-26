@@ -1,6 +1,6 @@
 {
-  "name": "laravel-vue-i18n",
-  "version": "2.9.0",
+  "name": "@wentthefox-forks/laravel-vue-i18n",
+  "version": "2.9.1",
   "author": {
     "name": "Francisco Madeira",
     "email": "xico2k@gmail.com"
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xiCO2k/laravel-vue-i18n.git"
+    "url": "git+https://github.com/WentTheFox/laravel-vue-i18n.git"
   },
   "license": "MIT",
   "description": "allows to connect your `Laravel` Framework localization files with `Vue`.",
@@ -98,5 +98,8 @@
       "prettier --parser=javascript --write"
     ]
   },
-  "type": "commonjs"
+  "type": "commonjs",
+  "publishConfig": {
+    "access": "public"
+  }
 }
