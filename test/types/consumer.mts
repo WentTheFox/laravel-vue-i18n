@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import { defineConfig } from 'vite'
-import { i18nVue, I18n } from 'laravel-vue-i18n'
-import i18n from 'laravel-vue-i18n/vite'
-import type { OptionsInterface } from 'laravel-vue-i18n/interfaces/options'
+import { i18nVue, I18n } from '@wentthefox-forks/laravel-vue-i18n'
+import i18n from '@wentthefox-forks/laravel-vue-i18n/vite'
+import type { OptionsInterface } from '@wentthefox-forks/laravel-vue-i18n/interfaces/options'
 
 const sync: OptionsInterface = { resolve: (lang) => ({ hello: lang }) }
 new I18n(sync)
