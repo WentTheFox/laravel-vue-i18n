@@ -430,7 +430,7 @@ export class I18n {
    * Get the translation for the given key and watch for any changes.
    */
   wTrans(key: string, replacements: ReplacementsInterface = {}): ComputedRef<string> {
-    watchEffect(() => {
+    const syncMessage = () => {
       let value = this.findTranslation(key)
 
       if (!this.isValid(value)) {
@@ -438,7 +438,16 @@ export class I18n {
       }
 
       this.activeMessages[key] = this.isValid(value) ? value : key
-    })
+    }
+
+    // Nothing can change the language while a page is rendered on the server, so there is nothing to watch. An
+    // effect created during a render is also never stopped there (components are never unmounted), which left every
+    // call subscribed to the process-wide activeMessages for good: one leaked effect per translation per request.
+    if (isServer) {
+      syncMessage()
+    } else {
+      watchEffect(syncMessage)
+    }
 
     return computed(() => this.makeReplacements(this.activeMessages[key], replacements))
   }
