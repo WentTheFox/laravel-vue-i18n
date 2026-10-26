@@ -1,0 +1,27 @@
+name: Publish fork
+
+# Publishes the @wentthefox-forks/laravel-vue-i18n fork to npm when a GitHub release is published.
+# Needs an NPM_TOKEN repository secret with publish access to the @wentthefox-forks scope.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-npm:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+      # `npm ci` also builds the package through the `prepare` script
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      # --ignore-scripts: the upstream `postpublish` script tags and pushes by itself, which the release already did
+      - run: npm publish --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
