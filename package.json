@@ -1,6 +1,6 @@
 {
   "name": "@wentthefox-forks/laravel-vue-i18n",
-  "version": "2.9.2",
+  "version": "2.9.3",
   "author": {
     "name": "Francisco Madeira",
     "email": "xico2k@gmail.com"
@@ -68,6 +68,7 @@
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.{ts,mts,cts}\" \"test/integration/*.mjs\" \"scripts/*.mjs\" \"*.mts\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.{ts,mts,cts}\" \"test/integration/*.mjs\" \"scripts/*.mjs\" \"*.mts\"",
     "build": "tsdown",
+    "publish:fork": "npm run build && npm test && npm publish --ignore-scripts",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag v$PACKAGE_VERSION && git push --tags"
