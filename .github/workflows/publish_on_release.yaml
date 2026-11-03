@@ -1,21 +1,29 @@
 name: Publish fork
 
 # Publishes the @wentthefox-forks/laravel-vue-i18n fork to npm when a GitHub release is published.
-# Needs an NPM_TOKEN repository secret with publish access to the @wentthefox-forks scope.
+# Uses npm trusted publishing (OIDC), so no NPM_TOKEN secret is needed. The package must have this repository and
+# workflow file (publish_on_release.yaml) configured as a Trusted Publisher in its settings on npmjs.com.
 on:
   release:
     types: [published]
+  # Allows re-running the publish from the current default branch, e.g. after fixing this workflow
+  workflow_dispatch:
 
 jobs:
   publish-npm:
     name: Publish to NPM
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for npm trusted publishing (OIDC)
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing needs npm >= 11.5.1
+      - run: npm install -g npm@^11.5.1
       # `npm ci` also builds the package through the `prepare` script
       - run: npm ci
       - run: npm run typecheck
@@ -23,5 +31,3 @@ jobs:
       - run: npm test
       # --ignore-scripts: the upstream `postpublish` script tags and pushes by itself, which the release already did
       - run: npm publish --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
