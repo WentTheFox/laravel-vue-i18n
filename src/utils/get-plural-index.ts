@@ -250,7 +250,8 @@ export function getPluralIndex(lang: string, number: number): number {
             : 3
     case 'lv':
     case 'lv-LV':
-      return number == 0 ? 0 : number % 10 == 1 && number % 100 != 11 ? 1 : 2
+      // CLDR: "zero" covers 0, numbers ending in 0 and 11-19; "one" covers numbers ending in 1 except 11
+      return number % 10 == 0 || (number % 100 >= 11 && number % 100 <= 19) ? 0 : number % 10 == 1 ? 1 : 2
     case 'pl':
     case 'pl-PL':
       return number == 1 ? 0 : number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 12 || number % 100 > 14) ? 1 : 2
